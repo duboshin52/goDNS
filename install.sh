@@ -1,11 +1,11 @@
 #!/bin/bash
 # goDNS — Copyright (c) 2026 anten-ka. All rights reserved.
 #
-# Установщик-загрузчик. Репозиторий ЗАКРЫТЫЙ: без GH_TOKEN публичный
-# raw.githubusercontent.com отдаёт 404, поэтому исходники тянутся через
-# api.github.com/…/tarball, а токен берётся из окружения.
+# Установщик-загрузчик публичного репозитория. Исходники тянутся через
+# api.github.com/…/tarball без авторизации. Необязательный GH_TOKEN можно
+# задать для приватного зеркала или увеличения лимита GitHub API.
 #
-#   GH_TOKEN=<ключ на чтение> bash install.sh      # из репозитория
+#   bash install.sh                              # из репозитория
 #   GODNS_LOCAL_SRC=/путь bash install.sh          # из принесённого дерева
 #
 # Ветка — GODNS_REF (по умолчанию main).
@@ -21,7 +21,7 @@
 
 set -euo pipefail
 
-REPO_OWNER="${GODNS_REPO_OWNER:-anten-ka}"
+REPO_OWNER="${GODNS_REPO_OWNER:-duboshin52}"
 REPO_NAME="${GODNS_REPO_NAME:-goDNS}"
 REPO_REF="${GODNS_REF:-main}"
 INSTALL_DIR="${GODNS_INSTALL_DIR:-/opt/godns-installer}"
@@ -131,7 +131,7 @@ if [ ${#need_pkgs[@]} -gt 0 ]; then
 fi
 
 # ── скачивание ──────────────────────────────────────────────────────────
-# GH_TOKEN читается из окружения (приватный репозиторий). В аргументы curl
+# Необязательный GH_TOKEN читается из окружения. В аргументы curl
 # его не кладём: /proc/<pid>/cmdline читает любой локальный пользователь.
 TARBALL="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/tarball/${REPO_REF}"
 TMP="$(mktemp -d /tmp/godns-dl.XXXXXX)"
@@ -162,7 +162,7 @@ chmod 600 "$CURL_CFG"
 # Установка из локального дерева или архива: GODNS_LOCAL_SRC=/путь.
 # Нужна там, где до GitHub не дотянуться, — офлайн-сервер, своя копия,
 # проверка правки до публикации. Без неё единственный способ поставить
-# приватный репозиторий — принести на сервер токен, а токен на сервере
+# приватное зеркало — принести на сервер токен, а токен на сервере
 # живёт дольше, чем задача, ради которой его принесли.
 mkdir -p "$TMP/x"
 if [ -n "${GODNS_LOCAL_SRC:-}" ]; then
